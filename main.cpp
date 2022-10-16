@@ -3,6 +3,7 @@
 #include "Descriptor.h"
 
 /* sudo apt-get install libudev-dev */
+/* sudo modprobe vhci-hcd */
 
 static USB::CDC::LineCoding _LineCoding = {};
 
@@ -123,7 +124,8 @@ static void _threadResponse(VirtualUSBDevice& dev) {
     }
 }
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char* argv[])
+{
     const VirtualUSBDevice::Info deviceInfo = {
         .deviceDesc             = &Descriptor::Device,
         .deviceQualifierDesc    = &Descriptor::DeviceQualifier,

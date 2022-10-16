@@ -10,7 +10,7 @@ compiler_path = "g++"
 compiler_flags =   ["-O0", 
                     "-g3", 
                     "-Wall", 
-                    "-std=c++20", 
+                    "-std=c++17", 
                     "-iquote", 
                     "Lib"
                     ]
@@ -23,7 +23,9 @@ linker_flags = ["-ludev",
 def compile(input_file:str, output_file:str) -> int:
     ''' returns 1 if error, 0 if ok '''
     print(". ", end='', flush=True)
-    return subprocess.call(f'{compiler_path} {" ".join(compiler_flags)} {input_file} -o {output_file}',shell=True)
+    c_str = f'{compiler_path} {" ".join(compiler_flags)} -c -o {output_file} {input_file}'
+    # print(c_str)
+    return subprocess.call(c_str,shell=True)
 
 
 def compile_all():
@@ -40,7 +42,12 @@ def link_all():
     for item in files:
         f_name = item.split("/")[-1]
         items += f'temp_files/{f_name.split(".")[0]}.o '
-    return subprocess.call(f'{compiler_path} {" ".join(linker_flags)} {items} -o temp_files/main.elf', shell=True)
+    c_str = f'{compiler_path} {" ".join(compiler_flags)} {items} -o main {" ".join(linker_flags)}'
+    # print(c_str)
+    return subprocess.call(c_str, shell=True)
+
+# g++ -O0 -g3 -Wall -std=c++17 -iquote Lib main.cpp -c -o temp_files/main.o
+# g++ -O0 -g3 -Wall -std=c++17 -iquote Lib -ludev -lpthread temp_files/main.o  -o main
 
 
 # def convert_elf():
