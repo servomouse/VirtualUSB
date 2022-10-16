@@ -448,48 +448,33 @@ private:
                 memcpy(payload.get(), data, payloadLen);
             }
             
-            rep = {
-                .header = {
-                    .base = {
-                        .command            = BFH_U32(USBIPLib::USBIP_RET_SUBMIT),
-                        .seqnum             = BFH_U32(cmd.header.base.seqnum),
-                        .devid              = BFH_U32(cmd.header.base.devid),
-                        .direction          = BFH_U32(cmd.header.base.direction),
-                        .ep                 = BFH_U32(cmd.header.base.ep),
-                    },
-                    
-                    .ret_submit = {
-                        .status             = BFH_S32(0),
-                        .actual_length      = BFH_S32(len),
-                        .start_frame        = BFH_S32(0),
-                        .number_of_packets  = BFH_S32(0),
-                        .error_count        = BFH_S32(0),
-                    },
-                },
+            rep.header.base.command = BFH_U32(USBIPLib::USBIP_RET_SUBMIT);
+            rep.header.base.seqnum = BFH_U32(cmd.header.base.seqnum);
+            rep.header.base.devid = BFH_U32(cmd.header.base.devid);
+            rep.header.base.direction = BFH_U32(cmd.header.base.direction);
+            rep.header.base.ep = BFH_U32(cmd.header.base.ep);
+
+            rep.header.ret_submit.status = BFH_S32(0);
+            rep.header.ret_submit.actual_length = BFH_S32(len);
+            rep.header.ret_submit.start_frame = BFH_S32(0);
+            rep.header.ret_submit.number_of_packets = BFH_S32(0);
+            rep.header.ret_submit.error_count = BFH_S32(0);
                 
-                .payload = std::move(payload),
-                .payloadLen = payloadLen,
-            };
+            rep.payload = std::move(payload);
+            rep.payloadLen = payloadLen;
             
             break;
         }
         
         case USBIPLib::USBIP_CMD_UNLINK: {
-            rep = {
-                .header = {
-                    .base = {
-                        .command            = BFH_U32(USBIPLib::USBIP_RET_UNLINK),
-                        .seqnum             = BFH_U32(cmd.header.base.seqnum),
-                        .devid              = BFH_U32(cmd.header.base.devid),
-                        .direction          = BFH_U32(cmd.header.base.direction),
-                        .ep                 = BFH_U32(cmd.header.base.ep),
-                    },
-                    
-                    .ret_unlink = {
-                        .status             = BFH_S32(status),
-                    },
-                },
-            };
+
+            rep.header.base.command      = BFH_U32(USBIPLib::USBIP_RET_UNLINK);
+            rep.header.base.seqnum       = BFH_U32(cmd.header.base.seqnum);
+            rep.header.base.devid        = BFH_U32(cmd.header.base.devid);
+            rep.header.base.direction    = BFH_U32(cmd.header.base.direction);
+            rep.header.base.ep           = BFH_U32(cmd.header.base.ep);
+
+            rep.header.ret_unlink.status = BFH_S32(status);
             break;
         }
         
