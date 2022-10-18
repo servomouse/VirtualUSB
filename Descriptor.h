@@ -2,6 +2,12 @@
 #include "LIB/Toastbox/Endian.h"
 #include "LIB/Toastbox/USB.h"
 
+#define VID     0x1234  // Must be uint16_t
+#define PID     0x5678  // Must be uint16_t
+#if !defined(VID) || !defined(PID)
+#error Define VID and PID first!
+#endif
+
 namespace Descriptor {
 
 using namespace Endian;
@@ -14,8 +20,8 @@ constexpr USB::DeviceDescriptor Device = {
     .bDeviceSubClass        = LFH_U8(0x00),
     .bDeviceProtocol        = LFH_U8(0x00),
     .bMaxPacketSize0        = LFH_U8(0x10),
-    .idVendor               = LFH_U16(0x1234),
-    .idProduct              = LFH_U16(0x5678),
+    .idVendor               = LFH_U16(VID),
+    .idProduct              = LFH_U16(PID),
     .bcdDevice              = LFH_U16(0x0100),
     .iManufacturer          = LFH_U8(0x01), // String1
     .iProduct               = LFH_U8(0x02), // String2

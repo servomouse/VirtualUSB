@@ -2,7 +2,9 @@ import os
 import subprocess
 import time
 
-files = ["main.cpp"
+files = ["main.cpp",
+         "VirtualUSBDevice.cpp",
+         "USBIPLib.cpp",
         ]
 
 
