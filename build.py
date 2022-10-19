@@ -5,6 +5,7 @@ import time
 files = ["main.cpp",
          "VirtualUSBDevice.cpp",
          "USBIPLib.cpp",
+         "LIB/Toastbox/USBDevice.cpp",
         ]
 
 
