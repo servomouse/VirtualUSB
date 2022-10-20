@@ -232,3 +232,40 @@ void USBDevice::_Retain(libusb_device* x)
 {
     libusb_ref_device(x);
 }
+
+void USBDevice::_Release(libusb_device* x)
+{
+    libusb_unref_device(x);
+}
+
+uint16_t USBDevice::maxPacketSize(uint8_t epAddr) const
+{
+    const _EndpointInfo& epInfo = _epInfo(epAddr);
+    return epInfo.maxPacketSize;
+}
+
+std::string USBDevice::manufacturer()
+{
+    return stringDescriptor(deviceDescriptor().iManufacturer).asciiString();
+}
+
+std::string USBDevice::product()
+{
+    return stringDescriptor(deviceDescriptor().iProduct).asciiString();
+}
+
+std::string USBDevice::serialNumber()
+{
+    return stringDescriptor(deviceDescriptor().iSerialNumber).asciiString();
+}
+
+std::vector<uint8_t> USBDevice::endpoints()
+{
+    std::vector<uint8_t> eps;
+    for (const _EndpointInfo& epInfo : _epInfos) {
+        if (epInfo.valid) {
+            eps.push_back(epInfo.epAddr);
+        }
+    }
+    return eps;
+}

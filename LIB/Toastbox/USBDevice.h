@@ -91,7 +91,7 @@ private:
     const _EndpointInfo& _epInfo(uint8_t epAddr) const;
     
     static void _Retain(libusb_device* x);
-    static void _Release(libusb_device* x) { libusb_unref_device(x); }
+    static void _Release(libusb_device* x);
     using _LibusbDev = RefCounted<libusb_device*, _Retain, _Release>;
     
     static void _Close(libusb_device_handle* x) { libusb_close(x); }
@@ -104,32 +104,15 @@ private:
     
 public:
     
-    uint16_t maxPacketSize(uint8_t epAddr) const {
-        const _EndpointInfo& epInfo = _epInfo(epAddr);
-        return epInfo.maxPacketSize;
-    }
+    uint16_t maxPacketSize(uint8_t epAddr) const;
     
-    std::string manufacturer() {
-        return stringDescriptor(deviceDescriptor().iManufacturer).asciiString();
-    }
+    std::string manufacturer();
     
-    std::string product() {
-        return stringDescriptor(deviceDescriptor().iProduct).asciiString();
-    }
+    std::string product();
     
-    std::string serialNumber() {
-        return stringDescriptor(deviceDescriptor().iSerialNumber).asciiString();
-    }
+    std::string serialNumber();
     
-    std::vector<uint8_t> endpoints() {
-        std::vector<uint8_t> eps;
-        for (const _EndpointInfo& epInfo : _epInfos) {
-            if (epInfo.valid) {
-                eps.push_back(epInfo.epAddr);
-            }
-        }
-        return eps;
-    }
+    std::vector<uint8_t> endpoints();
 };
 
 } // namespace Toastbox
