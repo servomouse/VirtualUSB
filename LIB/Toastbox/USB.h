@@ -8,7 +8,8 @@ namespace Toastbox::USB {
 // Revision 2.0
 
 // Descriptor Type (bDescriptorType, wValue [high byte])
-namespace DescriptorType {
+namespace DescriptorType
+{
     static constexpr uint8_t Device                     = 1;
     static constexpr uint8_t Configuration              = 2;
     static constexpr uint8_t String                     = 3;
@@ -20,7 +21,8 @@ namespace DescriptorType {
 };
 
 // Request (bRequest)
-namespace Request {
+namespace Request
+{
     static constexpr uint8_t GetStatus                  = 0;
     static constexpr uint8_t ClearFeature               = 1;
     static constexpr uint8_t _Reserved0                 = 2;
@@ -37,7 +39,8 @@ namespace Request {
 };
 
 // Request Type (bmRequestType)
-namespace RequestType {
+namespace RequestType
+{
     static constexpr uint8_t DirectionOut               = 0x00;
     static constexpr uint8_t DirectionIn                = 0x80;
     static constexpr uint8_t DirectionMask              = 0x80;
@@ -55,7 +58,8 @@ namespace RequestType {
     static constexpr uint8_t RecipientMask              = 0x1F;
 };
 
-namespace Endpoint {
+namespace Endpoint
+{
     static constexpr size_t MaxPacketSizeCtrl           = 64;
     static constexpr size_t MaxPacketSizeBulk           = 512;
     
@@ -73,11 +77,13 @@ namespace Endpoint {
     static constexpr uint8_t IndexMask                  = 0x0F;
 };
 
-namespace Language {
+namespace Language
+{
     static constexpr uint16_t English                   = 0x0409;
 };
 
-struct DeviceDescriptor {
+struct DeviceDescriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t bcdUSB;
@@ -94,12 +100,14 @@ struct DeviceDescriptor {
     uint8_t bNumConfigurations;
 } __attribute__((packed));
 
-namespace ConfigurationCharacteristics {
+namespace ConfigurationCharacteristics
+{
     static constexpr uint8_t RemoteWakeup               = 1<<5;
     static constexpr uint8_t SelfPowered                = 1<<6;
 };
 
-struct ConfigurationDescriptor {
+struct ConfigurationDescriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t wTotalLength;
@@ -110,7 +118,8 @@ struct ConfigurationDescriptor {
     uint8_t bMaxPower;
 } __attribute__((packed));
 
-struct InterfaceDescriptor {
+struct InterfaceDescriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bInterfaceNumber;
@@ -122,7 +131,8 @@ struct InterfaceDescriptor {
     uint8_t iInterface;
 } __attribute__((packed));
 
-struct EndpointDescriptor {
+struct EndpointDescriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bEndpointAddress;
@@ -131,7 +141,8 @@ struct EndpointDescriptor {
     uint8_t bInterval;
 } __attribute__((packed));
 
-struct DeviceQualifierDescriptor {
+struct DeviceQualifierDescriptor
+{
     uint8_t bLength;
     uint8_t bType;
     uint16_t bcdUSB;
@@ -143,13 +154,15 @@ struct DeviceQualifierDescriptor {
     uint8_t bReserved;
 } __attribute__((packed));
 
-struct StringDescriptor {
+struct StringDescriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
 } __attribute__((packed));
 
 template <size_t N>
-struct StringDescriptorN : StringDescriptor {
+struct StringDescriptorN : StringDescriptor
+{
     static_assert(N <= 126, "max character count is 126 (2 string descriptor header bytes + 126 UTF-16 characters == 2 + 2*126 == 254; more than that overflows bLength)");
     uint16_t str[N] = {};
     
@@ -178,28 +191,32 @@ struct StringDescriptorN : StringDescriptor {
 using StringDescriptorMax = StringDescriptorN<126>;
 
 template <size_t N>
-constexpr auto StringDescriptorMake(const char (&str)[N]) {
+constexpr auto StringDescriptorMake(const char (&str)[N])
+{
     return StringDescriptorN<N-1>(str);
 }
 
 template <size_t N>
-struct SupportedLanguagesDescriptorN : StringDescriptor {
+struct SupportedLanguagesDescriptorN : StringDescriptor
+{
     uint16_t langs[N] = {};
     
     constexpr SupportedLanguagesDescriptorN(const uint16_t (&l)[N]) :
-    StringDescriptor({.bLength=(2*N+2), .bDescriptorType=DescriptorType::String}) {
-        for (size_t i=0; i<N; i++) {
+    StringDescriptor({.bLength=(2*N+2), .bDescriptorType=DescriptorType::String})
+    {
+        for (size_t i=0; i<N; i++)
             langs[i] = Endian::LFH_U16(l[i]);
-        }
     }
 } __attribute__((packed));
 
 template <size_t N>
-constexpr auto SupportedLanguagesDescriptorMake(const uint16_t (&langs)[N]) {
+constexpr auto SupportedLanguagesDescriptorMake(const uint16_t (&langs)[N])
+{
     return SupportedLanguagesDescriptorN<N>(langs);
 }
 
-struct SetupRequest {
+struct SetupRequest
+{
     uint8_t bmRequestType;
     uint8_t bRequest;
     uint16_t wValue;
@@ -207,12 +224,14 @@ struct SetupRequest {
     uint16_t wLength;
 } __attribute__((packed));
 
-namespace CDC {
+namespace CDC
+{
 
 // Universal Serial Bus Class Definitions for Communication Devices
 // Version 1.1
 
-namespace Request {
+namespace Request
+{
     static constexpr uint8_t SEND_ENCAPSULATED_COMMAND  = 0x00;
     static constexpr uint8_t GET_ENCAPSULATED_RESPONSE  = 0x01;
     static constexpr uint8_t SET_COMM_FEATURE           = 0x02;
@@ -224,21 +243,24 @@ namespace Request {
     static constexpr uint8_t SEND_BREAK                 = 0x23;
 };
 
-struct HeaderFunctionalDescriptor {
+struct HeaderFunctionalDescriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
     uint16_t bcdCDC;
 } __attribute__((packed));
 
-struct AbstractControlManagementFunctionalDescriptor {
+struct AbstractControlManagementFunctionalDescriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
     uint8_t bmCapabilities;
 } __attribute__((packed));
 
-struct UnionFunctionalDescriptor {
+struct UnionFunctionalDescriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -246,7 +268,8 @@ struct UnionFunctionalDescriptor {
     uint8_t bSlaveInterface0;
 } __attribute__((packed));
 
-struct CallManagementFunctionalDescriptor {
+struct CallManagementFunctionalDescriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -254,7 +277,8 @@ struct CallManagementFunctionalDescriptor {
     uint8_t bDataInterface;
 } __attribute__((packed));
 
-struct LineCoding {
+struct LineCoding
+{
     uint32_t dwDTERate;
     uint8_t bCharFormat;
     uint8_t bParityType;

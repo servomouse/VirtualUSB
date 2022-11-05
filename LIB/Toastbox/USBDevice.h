@@ -77,39 +77,45 @@ private:
     };
     
     static libusb_context* _USBCtx();
-    
+
     static uint8_t _OffsetForEndpointAddr(uint8_t epAddr);
-    
+
     static unsigned int _LibUSBTimeoutFromMs(Milliseconds timeout);
-    
+
     static void _CheckErr(int ir, const char* errMsg);
-    
+
     void _openIfNeeded();
-    
+
     void _claimInterfaceForEndpointAddr(uint8_t epAddr);
-    
+
     const _EndpointInfo& _epInfo(uint8_t epAddr) const;
-    
+
     static void _Retain(libusb_device* x);
+
     static void _Release(libusb_device* x);
+
     using _LibusbDev = RefCounted<libusb_device*, _Retain, _Release>;
-    
+
     static void _Close(libusb_device_handle* x) { libusb_close(x); }
+
     using _LibusbHandle = Uniqued<libusb_device_handle*, _Close>;
-    
+
     _LibusbDev _dev = {};
+
     _LibusbHandle _handle = {};
+
     std::vector<_Interface> _interfaces = {};
+
     _EndpointInfo _epInfos[USB::Endpoint::MaxCount] = {};
     
 public:
     
     uint16_t maxPacketSize(uint8_t epAddr) const;
-    
+
     std::string manufacturer();
-    
+
     std::string product();
-    
+
     std::string serialNumber();
     
     std::vector<uint8_t> endpoints();

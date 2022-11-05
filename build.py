@@ -1,12 +1,21 @@
 import os
 import subprocess
 import time
+import glob
 
-files = ["main.cpp",
-         "VirtualUSBDevice.cpp",
-         "USBIPLib.cpp",
-         "LIB/Toastbox/USBDevice.cpp",
-        ]
+additional_files = ["main.cpp",
+                    "VirtualUSBDevice.cpp",
+                    "USBIPLib.cpp",
+                    "LIB/Toastbox/USBDevice.cpp",
+                    ]
+
+def get_files(path:str)->list:
+    result = []
+    for x in os.walk(path):
+        for y in glob.glob(os.path.join(x[0], '*.cpp')):
+            result.append(y[len(path)+1:])
+    # print(',\n'.join(result))
+    return(result)
 
 
 compiler_path = "g++"
@@ -31,7 +40,7 @@ def compile(input_file:str, output_file:str) -> int:
     return subprocess.call(c_str,shell=True)
 
 
-def compile_all():
+def compile_all(files:list):
     for item in files:
         f_name = item.split("/")[-1]
         f_type = item.split(".")[-1]
@@ -40,7 +49,7 @@ def compile_all():
                 return 1
     return 0
 
-def link_all():
+def link_all(files:list):
     items = ''
     for item in files:
         f_name = item.split("/")[-1]
@@ -58,13 +67,13 @@ def link_all():
 #     subprocess.call(f'{objcopy_path} -O binary temp_files/main.elf firmware.bin', shell=True)
 
 
-def main():
+def main(files:list):
     print("Compilation: ", end='', flush=True)
     if not os.path.isdir('temp_files'):
         subprocess.call('mkdir temp_files', shell=True)
-    if 0 == compile_all():
+    if 0 == compile_all(files):
         print("complete!")
-        if 0 == link_all():
+        if 0 == link_all(files):
             # convert_elf()
             # subprocess.call(f'{common_path}arm-none-eabi-objdump --disassemble temp_files/main.elf > temp_files/main.list', shell=True)
             subprocess.call('rm -r temp_files/*', shell=True)
@@ -74,4 +83,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    files = []
+    for i in additional_files:
+        files.append(i)
+    for i in get_files(os.path.abspath(os.getcwd())):
+        if not i in additional_files:
+            files.append(i)
+
+    # print(files)
+    main(files)

@@ -1,5 +1,7 @@
 #pragma once
 #include <functional>
+#include <stdint.h>
+#include "IRQState.h"
 
 #define TaskBegin()                         \
     Task& _task = (*Task::_CurrentTask);    \
@@ -34,7 +36,8 @@
     jmp:;                                   \
 })
 
-class Task {
+class Task
+{
 public:
     // Functions provided by client
     static uint32_t TimeMs();
@@ -48,89 +51,28 @@ public:
     using TaskFn = std::function<void(void)>;
     
     template <typename T, size_t N>
-    [[noreturn]] static void Run(T (&tasks)[N]) {
-        for (;;) {
-            bool didWork = false;
-            do {
-                _IRQ.disable();
-                didWork = false;
-                for (Task& task : tasks) {
-                    didWork |= task.run();
-                }
-            } while (didWork);
-            IRQState::WaitForInterrupt();
-            _IRQ.restore();
-        }
-    }
+    [[noreturn]] static void Run(T (&tasks)[N]);
     
     template <typename ...T>
-    [[noreturn]] static void Run(T&... ts) {
-        std::reference_wrapper<Task> tasks[] = { static_cast<Task&>(ts)... };
-        Run(tasks);
-    }
+    [[noreturn]] static void Run(T&... ts);
     
     Task(TaskFn fn) : _fn(fn) {}
     
-    void start() {
-        _state = State::Run;
-        _jmp = nullptr;
-    }
+    void start();
     
-    void pause() {
-        _state = State::Stop;
-    }
+    void pause();
     
-    void resume() {
-        _state = State::Run;
-    }
+    void resume();
     
-    bool run() {
-        // Run the task
-        Task*const prevTask = _CurrentTask;
-        _CurrentTask = this;
-        _didWork = false;
-        switch (_state) {
-        case State::Run:
-        case State::Wait:
-            _fn();
-            break;
-        default:
-            break;
-        }
-        
-        switch (_state) {
-        case State::Run:
-            // The task terminated if it returns in the 'Run' state, so update its state
-            _state = State::Stop;
-            _jmp = nullptr;
-            break;
-        default:
-            break;
-        }
-        
-        _CurrentTask = prevTask;
-        return _didWork;
-    }
+    bool run();
     
-    void _setSleeping(uint32_t ms) {
-        _state = Task::State::Wait;
-        _sleepStartMs = Task::TimeMs();
-        _sleepDurationMs = ms;
-    }
+    void _setSleeping(uint32_t ms);
     
-    void _setWaiting() {
-        _state = Task::State::Wait;
-    }
+    void _setWaiting();
     
-    void _setRunning() {
-        _state = Task::State::Run;
-        _didWork = true;
-        _IRQ.restore();
-    }
+    void _setRunning();
     
-    bool _sleepDone() const {
-        return (TimeMs()-_sleepStartMs) >= _sleepDurationMs;
-    }
+    bool _sleepDone() const;
     
     static inline Task* _CurrentTask = nullptr;
     static inline IRQState _IRQ;

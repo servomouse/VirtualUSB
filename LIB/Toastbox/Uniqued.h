@@ -2,7 +2,8 @@
 #include <optional>
 
 template <typename T, auto FreeFn>
-class Uniqued {
+class Uniqued
+{
 public:
     // Default constructor: empty
     Uniqued() {}
