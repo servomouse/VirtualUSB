@@ -4,7 +4,8 @@
 template <typename T, size_t N>
 [[noreturn]] void Task::Run(T (&tasks)[N])
 {
-    for (;;) {
+    while(1)
+    {
         bool didWork = false;
         do {
             _IRQ.disable();
@@ -22,6 +23,16 @@ template <typename ...T>
 {
     std::reference_wrapper<Task> tasks[] = { static_cast<Task&>(ts)... };
     Run(tasks);
+}
+
+Task::Task(std::function<void(void)> fn) : _fn(fn)
+{
+    _CurrentTask = nullptr;
+    _state = State::Run;
+    _didWork = false;
+    _jmp = nullptr;
+    _sleepStartMs = 0;
+    _sleepDurationMs = 0;
 }
 
 void Task::start()

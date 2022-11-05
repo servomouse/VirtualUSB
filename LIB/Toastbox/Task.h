@@ -48,7 +48,7 @@ public:
         Stop,
     };
     
-    using TaskFn = std::function<void(void)>;
+    // using TaskFn = std::function<void(void)>;
     
     template <typename T, size_t N>
     [[noreturn]] static void Run(T (&tasks)[N]);
@@ -56,7 +56,7 @@ public:
     template <typename ...T>
     [[noreturn]] static void Run(T&... ts);
     
-    Task(TaskFn fn) : _fn(fn) {}
+    Task(std::function<void(void)> fn);
     
     void start();
     
@@ -74,12 +74,12 @@ public:
     
     bool _sleepDone() const;
     
-    static inline Task* _CurrentTask = nullptr;
     static inline IRQState _IRQ;
-    TaskFn _fn;
-    State _state = State::Run;
-    bool _didWork = false;
-    void* _jmp = nullptr;
-    uint32_t _sleepStartMs = 0;
-    uint32_t _sleepDurationMs = 0;
+    std::function<void(void)> _fn;
+    static inline Task* _CurrentTask;
+    State _state;
+    bool _didWork;
+    void* _jmp;
+    uint32_t _sleepStartMs;
+    uint32_t _sleepDurationMs;
 };

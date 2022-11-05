@@ -6,47 +6,26 @@ public:
     static bool SetInterruptsEnabled(bool en);
     static void WaitForInterrupt();
     
-    static IRQState Enabled() {
-        IRQState irq;
-        irq.enable();
-        return irq;
-    }
+    static IRQState Enabled(void);
+
+    static IRQState get_object(void);
     
-    static IRQState Disabled() {
-        IRQState irq;
-        irq.disable();
-        return irq;
-    }
+    static IRQState Disabled(void);
     
-    IRQState()                  = default;
-    IRQState(const IRQState& x) = delete;
+    IRQState()                  = default;  // use the compiler-generated version of that function
+    IRQState(const IRQState& x) = delete;   // I don't want the compiler to generate that function automatically
     IRQState(IRQState&& x)      = default;
     
-    ~IRQState() {
-        restore();
-    }
+    ~IRQState();
     
-    void enable() {
-        _Assert(!_prevEnValid);
-        _prevEn = SetInterruptsEnabled(true);
-        _prevEnValid = true;
-    }
+    void enable();
     
-    void disable() {
-        _Assert(!_prevEnValid);
-        _prevEn = SetInterruptsEnabled(false);
-        _prevEnValid = true;
-    }
+    void disable();
     
-    void restore() {
-        if (_prevEnValid) {
-            SetInterruptsEnabled(_prevEn);
-            _prevEnValid = false;
-        }
-    }
+    void restore();
     
 private:
-    static void _Assert(bool cond) { if (!cond) abort(); }
+    static void _Assert(bool cond);
     
     bool _prevEn = false;
     bool _prevEnValid = false;

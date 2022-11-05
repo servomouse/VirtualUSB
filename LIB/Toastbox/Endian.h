@@ -2,7 +2,8 @@
 
 namespace Toastbox::Endian {
 
-constexpr int16_t Swap(int16_t x) {
+constexpr int16_t Swap(int16_t x)
+{
     return  (x&0xFF00)>>8   |
             (x&0x00FF)<< 8  ;
 }

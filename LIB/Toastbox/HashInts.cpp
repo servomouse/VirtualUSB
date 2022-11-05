@@ -1,11 +1,9 @@
-#pragma once
-#include <cstddef>
-#include <cstdint>
 
-namespace Toastbox {
+#include "HashInts.h"
 
 template <typename... Ts>
-size_t HashInts(Ts... ts) {
+size_t Toastbox::HashInts(Ts... ts)
+{
     // FNV-1 hash
     const uintmax_t v[] = {(uintmax_t)ts...};
     const uint8_t* b = (uint8_t*)&v;
@@ -16,5 +14,3 @@ size_t HashInts(Ts... ts) {
     }
     return hash;
 }
-
-} // namespace Toastbox

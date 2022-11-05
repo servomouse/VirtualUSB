@@ -40,7 +40,7 @@ public:
     using Err = std::exception_ptr;
     static const inline Err ErrStopped = std::make_exception_ptr(std::runtime_error("VirtualUSBDevice stopped"));
     
-    typedef struct Xfer
+    struct Xfer
     {
         uint8_t ep = 0;
         USB::SetupRequest setupReq = {};

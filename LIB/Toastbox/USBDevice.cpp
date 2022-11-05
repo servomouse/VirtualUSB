@@ -91,7 +91,7 @@ USB::ConfigurationDescriptor USBDevice::configurationDescriptor(uint8_t idx) con
     };
 }
 
-USB::StringDescriptorMax USBDevice::stringDescriptor(uint8_t idx, uint16_t lang=USB::Language::English)
+USB::StringDescriptorMax USBDevice::stringDescriptor(uint8_t idx, uint16_t lang)
 {
     _openIfNeeded();
     
@@ -103,14 +103,14 @@ USB::StringDescriptorMax USBDevice::stringDescriptor(uint8_t idx, uint16_t lang=
 }
 
 template <typename T>
-void USBDevice::read(uint8_t epAddr, T& t, Milliseconds timeout=Forever)
+void USBDevice::read(uint8_t epAddr, T& t, Milliseconds timeout)
 {
     const size_t len = read(epAddr, (void*)&t, sizeof(t), timeout);
     if (len != sizeof(t)) throw RuntimeError("read() didn't read enough data (needed %ju bytes, got %ju bytes)",
         (uintmax_t)sizeof(t), (uintmax_t)len);
 }
 
-size_t USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeout=Forever)
+size_t USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeout)
 {
     _claimInterfaceForEndpointAddr(epAddr);
     int xferLen = 0;
@@ -121,12 +121,12 @@ size_t USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeo
 }
 
 template <typename T>
-void USBDevice::write(uint8_t epAddr, T& x, Milliseconds timeout=Forever)
+void USBDevice::write(uint8_t epAddr, T& x, Milliseconds timeout)
 {
     write(epAddr, (void*)&x, sizeof(x), timeout);
 }
 
-void USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Milliseconds timeout=Forever)
+void USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Milliseconds timeout)
 {
     _claimInterfaceForEndpointAddr(epAddr);
     
@@ -146,12 +146,12 @@ void USBDevice::reset(uint8_t epAddr)
 }
 
 template <typename T>
-void USBDevice::vendorRequestOut(uint8_t req, const T& x, Milliseconds timeout=Forever)
+void USBDevice::vendorRequestOut(uint8_t req, const T& x, Milliseconds timeout)
 {
     vendorRequestOut(req, (void*)&x, sizeof(x), timeout);
 }
 
-void USBDevice::vendorRequestOut(uint8_t req, const void* data, size_t len, Milliseconds timeout=Forever)
+void USBDevice::vendorRequestOut(uint8_t req, const void* data, size_t len, Milliseconds timeout)
 {
     _openIfNeeded();
     
