@@ -24,7 +24,7 @@ compiler_flags =   ["-O0",
                     "-Wall", 
                     "-std=c++17", 
                     "-iquote", 
-                    "Lib"
+                    "Lib",
                     ]
 
 linker_path = "g++"
