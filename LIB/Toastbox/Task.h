@@ -40,7 +40,7 @@ class Task
 {
 public:
     // Functions provided by client
-    static uint32_t TimeMs();
+    // static uint32_t TimeMs();
     
     enum class State {
         Run,
@@ -66,13 +66,13 @@ public:
     
     bool run();
     
-    void _setSleeping(uint32_t ms);
+    // void _setSleeping(uint32_t ms);
     
     void _setWaiting();
     
     void _setRunning();
     
-    bool _sleepDone() const;
+    // bool _sleepDone() const;
     
     static inline IRQState _IRQ;
     std::function<void(void)> _fn;

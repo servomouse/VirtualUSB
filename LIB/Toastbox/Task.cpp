@@ -86,12 +86,12 @@ bool Task::run()
     return _didWork;
 }
     
-void Task::_setSleeping(uint32_t ms)
-{
-    _state = Task::State::Wait;
-    _sleepStartMs = Task::TimeMs();
-    _sleepDurationMs = ms;
-}
+// void Task::_setSleeping(uint32_t ms)
+// {
+//     _state = Task::State::Wait;
+//     _sleepStartMs = Task::TimeMs();
+//     _sleepDurationMs = ms;
+// }
     
 void Task::_setWaiting()
 {
@@ -105,8 +105,8 @@ void Task::_setRunning()
     _IRQ.restore();
 }
 
-bool Task::_sleepDone() const
-{
-    return (TimeMs()-_sleepStartMs) >= _sleepDurationMs;
-}
+// bool Task::_sleepDone() const
+// {
+//     return (TimeMs()-_sleepStartMs) >= _sleepDurationMs;
+// }
 

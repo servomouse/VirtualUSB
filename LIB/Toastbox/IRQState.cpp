@@ -2,22 +2,19 @@
 #include <stdio.h>
 #include <cstdlib>  // for abort() function
 
-// #warning temporary implementation
-// bool IRQState::SetInterruptsEnabled(bool en)
-// {
-//     return en;
-// }
+static bool int_enabled = false;
 
-// #warning temporary implementation
-// void IRQState::WaitForInterrupt(void)
-// {
-//     return;
-// }
-
-IRQState IRQState::get_object(void)
+#warning temporary implementation
+bool IRQState::SetInterruptsEnabled(bool en)
 {
-    IRQState a;
-    return a;
+    int_enabled = en;
+    return int_enabled;
+}
+
+#warning temporary implementation
+void IRQState::WaitForInterrupt(void)
+{
+    return;
 }
     
 IRQState IRQState::Enabled(void)

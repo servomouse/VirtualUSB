@@ -7,8 +7,6 @@ public:
     static void WaitForInterrupt();
     
     static IRQState Enabled(void);
-
-    static IRQState get_object(void);
     
     static IRQState Disabled(void);
     
