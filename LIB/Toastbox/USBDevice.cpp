@@ -1,8 +1,9 @@
 #include "USBDevice.h"
+#include <libusb-1.0/libusb.h>
 
-using namespace Toastbox;
+// using namespace Toastbox;
 
-std::vector<USBDevice> USBDevice::GetDevices()
+std::vector<Toastbox::USBDevice> Toastbox::USBDevice::GetDevices()
 {
     libusb_device** devs = nullptr;
     ssize_t devsCount = libusb_get_device_list(_USBCtx(), &devs);
@@ -16,7 +17,7 @@ std::vector<USBDevice> USBDevice::GetDevices()
     return r;
 }
 
-USBDevice::USBDevice(libusb_device* dev) : _dev(_LibusbDev::Retain, std::move(dev))
+Toastbox::USBDevice::USBDevice(libusb_device* dev) : _dev(_LibusbDev::Retain, std::move(dev))
 {
     assert(dev);
     
@@ -50,7 +51,7 @@ USBDevice::USBDevice(libusb_device* dev) : _dev(_LibusbDev::Retain, std::move(de
     }
 }
 
-USB::DeviceDescriptor USBDevice::deviceDescriptor() const
+Toastbox::USB::DeviceDescriptor Toastbox::USBDevice::deviceDescriptor() const
 {
     struct libusb_device_descriptor desc;
     int ir = libusb_get_device_descriptor(_dev, &desc);
@@ -74,7 +75,7 @@ USB::DeviceDescriptor USBDevice::deviceDescriptor() const
     };
 }
 
-USB::ConfigurationDescriptor USBDevice::configurationDescriptor(uint8_t idx) const
+Toastbox::USB::ConfigurationDescriptor Toastbox::USBDevice::configurationDescriptor(uint8_t idx) const
 {
     struct libusb_config_descriptor* desc;
     int ir = libusb_get_config_descriptor(_dev, idx, &desc);
@@ -91,7 +92,7 @@ USB::ConfigurationDescriptor USBDevice::configurationDescriptor(uint8_t idx) con
     };
 }
 
-USB::StringDescriptorMax USBDevice::stringDescriptor(uint8_t idx, uint16_t lang)
+Toastbox::USB::StringDescriptorMax Toastbox::USBDevice::stringDescriptor(uint8_t idx, uint16_t lang)
 {
     _openIfNeeded();
     
@@ -103,14 +104,15 @@ USB::StringDescriptorMax USBDevice::stringDescriptor(uint8_t idx, uint16_t lang)
 }
 
 template <typename T>
-void USBDevice::read(uint8_t epAddr, T& t, Milliseconds timeout)
+void Toastbox::USBDevice::read(uint8_t epAddr, T& t, Milliseconds timeout)
 {
     const size_t len = read(epAddr, (void*)&t, sizeof(t), timeout);
     if (len != sizeof(t)) throw RuntimeError("read() didn't read enough data (needed %ju bytes, got %ju bytes)",
         (uintmax_t)sizeof(t), (uintmax_t)len);
 }
 
-size_t USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeout)
+// #warning TODO: loop if ior==interrupted
+size_t Toastbox::USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeout)
 {
     _claimInterfaceForEndpointAddr(epAddr);
     int xferLen = 0;
@@ -121,12 +123,12 @@ size_t USBDevice::read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeo
 }
 
 template <typename T>
-void USBDevice::write(uint8_t epAddr, T& x, Milliseconds timeout)
+void Toastbox::USBDevice::write(uint8_t epAddr, T& x, Milliseconds timeout)
 {
     write(epAddr, (void*)&x, sizeof(x), timeout);
 }
 
-void USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Milliseconds timeout)
+void Toastbox::USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Milliseconds timeout)
 {
     _claimInterfaceForEndpointAddr(epAddr);
     
@@ -138,7 +140,7 @@ void USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Milliseconds 
         throw RuntimeError("libusb_bulk_transfer short write (tried: %zu, got: %zu)", len, (size_t)xferLen);
 }
 
-void USBDevice::reset(uint8_t epAddr)
+void Toastbox::USBDevice::reset(uint8_t epAddr)
 {
     _claimInterfaceForEndpointAddr(epAddr);
     int ir = libusb_clear_halt(_handle, epAddr);
@@ -146,12 +148,12 @@ void USBDevice::reset(uint8_t epAddr)
 }
 
 template <typename T>
-void USBDevice::vendorRequestOut(uint8_t req, const T& x, Milliseconds timeout)
+void Toastbox::USBDevice::vendorRequestOut(uint8_t req, const T& x, Milliseconds timeout)
 {
     vendorRequestOut(req, (void*)&x, sizeof(x), timeout);
 }
 
-void USBDevice::vendorRequestOut(uint8_t req, const void* data, size_t len, Milliseconds timeout)
+void Toastbox::USBDevice::vendorRequestOut(uint8_t req, const void* data, size_t len, Milliseconds timeout)
 {
     _openIfNeeded();
     
@@ -167,12 +169,12 @@ void USBDevice::vendorRequestOut(uint8_t req, const void* data, size_t len, Mill
     _CheckErr(ir, "libusb_control_transfer failed");
 }
 
-bool USBDevice::operator==(const USBDevice& x) const
+bool Toastbox::USBDevice::operator==(const USBDevice& x) const
 {
     return _dev == x._dev;
 }
 
-libusb_context* USBDevice::_USBCtx()
+libusb_context* Toastbox::USBDevice::_USBCtx()
 {
     static std::once_flag Once;
     static libusb_context* Ctx = nullptr;
@@ -183,24 +185,24 @@ libusb_context* USBDevice::_USBCtx()
     return Ctx;
 }
 
-uint8_t USBDevice::_OffsetForEndpointAddr(uint8_t epAddr)
+uint8_t Toastbox::USBDevice::_OffsetForEndpointAddr(uint8_t epAddr)
 {
     return ((epAddr&USB::Endpoint::DirectionMask)>>3) | (epAddr&USB::Endpoint::IndexMask);
 }
 
-unsigned int USBDevice::_LibUSBTimeoutFromMs(Milliseconds timeout)
+unsigned int Toastbox::USBDevice::_LibUSBTimeoutFromMs(Milliseconds timeout)
 {
     if (timeout == Forever) return 0;
     else if (timeout == Milliseconds::zero()) return 1;
     else return timeout.count();
 }
 
-void USBDevice::_CheckErr(int ir, const char* errMsg)
+void Toastbox::USBDevice::_CheckErr(int ir, const char* errMsg)
 {
     if (ir < 0) throw RuntimeError("%s: %s", errMsg, libusb_error_name(ir));
 }
 
-void USBDevice::_openIfNeeded()
+void Toastbox::USBDevice::_openIfNeeded()
 {
     if (_handle.hasValue()) return;
     libusb_device_handle* handle = nullptr;
@@ -209,7 +211,7 @@ void USBDevice::_openIfNeeded()
     _handle = handle;
 }
 
-void USBDevice::_claimInterfaceForEndpointAddr(uint8_t epAddr)
+void Toastbox::USBDevice::_claimInterfaceForEndpointAddr(uint8_t epAddr)
 {
     _openIfNeeded();
     const _EndpointInfo& epInfo = _epInfo(epAddr);
@@ -221,45 +223,45 @@ void USBDevice::_claimInterfaceForEndpointAddr(uint8_t epAddr)
     }
 }
 
-const USBDevice::_EndpointInfo& USBDevice::_epInfo(uint8_t epAddr) const
+const Toastbox::USBDevice::_EndpointInfo& Toastbox::USBDevice::_epInfo(uint8_t epAddr) const
 {
     const _EndpointInfo& epInfo = _epInfos[_OffsetForEndpointAddr(epAddr)];
     if (!epInfo.valid) throw RuntimeError("invalid endpoint address: 0x%02x", epAddr);
     return epInfo;
 }
 
-void USBDevice::_Retain(libusb_device* x)
+void Toastbox::USBDevice::_Retain(libusb_device* x)
 {
     libusb_ref_device(x);
 }
 
-void USBDevice::_Release(libusb_device* x)
+void Toastbox::USBDevice::_Release(libusb_device* x)
 {
     libusb_unref_device(x);
 }
 
-uint16_t USBDevice::maxPacketSize(uint8_t epAddr) const
+uint16_t Toastbox::USBDevice::maxPacketSize(uint8_t epAddr) const
 {
     const _EndpointInfo& epInfo = _epInfo(epAddr);
     return epInfo.maxPacketSize;
 }
 
-std::string USBDevice::manufacturer()
+std::string Toastbox::USBDevice::manufacturer()
 {
     return stringDescriptor(deviceDescriptor().iManufacturer).asciiString();
 }
 
-std::string USBDevice::product()
+std::string Toastbox::USBDevice::product()
 {
     return stringDescriptor(deviceDescriptor().iProduct).asciiString();
 }
 
-std::string USBDevice::serialNumber()
+std::string Toastbox::USBDevice::serialNumber()
 {
     return stringDescriptor(deviceDescriptor().iSerialNumber).asciiString();
 }
 
-std::vector<uint8_t> USBDevice::endpoints()
+std::vector<uint8_t> Toastbox::USBDevice::endpoints()
 {
     std::vector<uint8_t> eps;
     for (const _EndpointInfo& epInfo : _epInfos) {
@@ -268,4 +270,9 @@ std::vector<uint8_t> USBDevice::endpoints()
         }
     }
     return eps;
+}
+
+void Toastbox::USBDevice::_Close(libusb_device_handle* x)
+{
+    libusb_close(x);
 }

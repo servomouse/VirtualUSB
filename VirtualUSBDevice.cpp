@@ -1,5 +1,9 @@
 #include "VirtualUSBDevice.h"
 
+#define USB             Toastbox::USB
+#define RuntimeError    Toastbox::RuntimeError
+#define Endian          Toastbox::Endian
+
 struct _Data
 {
     std::unique_ptr<uint8_t[]> data;

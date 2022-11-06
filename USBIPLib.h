@@ -1,8 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
-/*
- * Copyright (C) 2005-2007 Takahiro Hirofuchi
- */
-
 #pragma once
 #include <cstdint>
 #include <libudev.h>
@@ -27,12 +22,14 @@ constexpr size_t MAX_STATUS_NAME = 18;
 constexpr char USBIP_VHCI_BUS_TYPE[] = "platform";
 constexpr char USBIP_VHCI_DEVICE_NAME[] = "vhci_hcd.0";
 
-enum hub_speed {
+enum hub_speed
+{
     HUB_SPEED_HIGH = 0,
     HUB_SPEED_SUPER,
 };
 
-enum usbip_status {
+enum usbip_status
+{
     /* sdev is available. */
     SDEV_ST_AVAILABLE = 0x01,
     /* sdev is now used. */
@@ -69,7 +66,8 @@ typedef struct __attribute__((packed)) usbip_usb_device_t
     uint8_t bNumInterfaces;
 } usbip_usb_device;
 
-typedef struct usbip_imported_device_t {
+typedef struct usbip_imported_device_t
+{
     enum hub_speed hub;
     uint8_t port;
     uint32_t status;
@@ -93,7 +91,8 @@ typedef struct usbip_vhci_driver_t
     usbip_imported_device idev[];
 }usbip_vhci_driver;
 
-enum usb_device_speed {
+enum usb_device_speed
+{
     USB_SPEED_UNKNOWN = 0,            /* enumerating */
     USB_SPEED_LOW, USB_SPEED_FULL,        /* usb 1.1 */
     USB_SPEED_HIGH,                /* usb 2.0 */
@@ -102,13 +101,15 @@ enum usb_device_speed {
     USB_SPEED_SUPER_PLUS,            /* usb 3.1 */
 };
 
-struct speed_string {
+struct speed_string
+{
     int num;
     const char *speed;
     const char *desc;
 };
 
-static const struct speed_string speed_strings[] = {
+static const struct speed_string speed_strings[] =
+{
     { USB_SPEED_UNKNOWN, "unknown", "Unknown Speed"},
     { USB_SPEED_LOW,  "1.5", "Low Speed(1.5Mbps)"  },
     { USB_SPEED_FULL, "12",  "Full Speed(12Mbps)" },

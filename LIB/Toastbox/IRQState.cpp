@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include <cstdlib>  // for abort() function
 
+// #warning temporary implementation
+// bool IRQState::SetInterruptsEnabled(bool en)
+// {
+//     return en;
+// }
+
+// #warning temporary implementation
+// void IRQState::WaitForInterrupt(void)
+// {
+//     return;
+// }
+
 IRQState IRQState::get_object(void)
 {
     IRQState a;

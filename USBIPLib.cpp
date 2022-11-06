@@ -1,15 +1,9 @@
 
-
-#include <cstdint>
-#include <libudev.h>
-#include <dirent.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/socket.h>
 #include "USBIPLib.h"
+#include <cstdlib>  // for abort() function
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdio.h>
 
 #define to_string(s) #s
 #define READ_ATTR(object, type, dev, name, format)                                \
@@ -79,7 +73,7 @@ int USBIPLib::write_sysfs_attribute(const char *attr_path, const char *new_value
 }
 
 
-int read_attr_speed(struct udev_device *dev)
+int USBIPLib::read_attr_speed(struct udev_device *dev)
 {
     const char *speed;
 
@@ -99,7 +93,7 @@ err:
     return USBIPLib::USB_SPEED_UNKNOWN;
 }
 
-int read_attr_value(struct udev_device *dev, const char *name,
+int USBIPLib::read_attr_value(struct udev_device *dev, const char *name,
             const char *format)
 {
     const char *attr;
@@ -136,7 +130,7 @@ err:
     return num;
 }
 
-int read_usb_device(struct udev_device *sdev, USBIPLib::usbip_usb_device *udev)
+int USBIPLib::read_usb_device(struct udev_device *sdev, USBIPLib::usbip_usb_device *udev)
 {
     uint32_t busnum, devnum;
     const char *path, *name;
@@ -327,7 +321,7 @@ static int refresh_imported_device_list(void)
     return 0;
 }
 
-int usbip_vhci_driver_open(void)
+int USBIPLib::usbip_vhci_driver_open(void)
 {
     int nports;
     struct udev_device *hc_device;
@@ -391,7 +385,7 @@ err:
     return -1;
 }
 
-int usbip_vhci_get_free_port(uint32_t speed)
+int USBIPLib::usbip_vhci_get_free_port(uint32_t speed)
 {
     for (int i = 0; i < vhci_driver->nports; i++) {
 
@@ -413,7 +407,7 @@ int usbip_vhci_get_free_port(uint32_t speed)
     return -1;
 }
 
-int usbip_vhci_attach_device2(uint8_t port, int sockfd, uint32_t devid, uint32_t speed)
+int USBIPLib::usbip_vhci_attach_device2(uint8_t port, int sockfd, uint32_t devid, uint32_t speed)
 {
     char buff[200]; /* what size should be ? */
     char attach_attr_path[USBIPLib::SYSFS_PATH_MAX];
@@ -441,7 +435,7 @@ int usbip_vhci_attach_device2(uint8_t port, int sockfd, uint32_t devid, uint32_t
     return 0;
 }
 
-void usbip_vhci_driver_close(void)
+void USBIPLib::usbip_vhci_driver_close(void)
 {
 	if (!vhci_driver)
 		return;

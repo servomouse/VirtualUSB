@@ -6,7 +6,7 @@
 /* sudo modprobe vhci-hcd */
 /* specify VID and PID in the Descriptor.h */
 
-static USB::CDC::LineCoding _LineCoding = {};
+static Toastbox::USB::CDC::LineCoding _LineCoding = {};
 
 static struct
 {
@@ -17,34 +17,34 @@ static struct
 
 static void _handleXferEP0(VirtualUSBDevice& dev, VirtualUSBDevice::Xfer&& xfer)
 {
-    const USB::SetupRequest req = xfer.setupReq;
+    const Toastbox::USB::SetupRequest req = xfer.setupReq;
     const uint8_t* payload = xfer.data.get();
     const size_t payloadLen = xfer.len;
     
     // Verify that this request is a `Class` request
-    if ((req.bmRequestType&USB::RequestType::TypeMask) != USB::RequestType::TypeClass)
-        throw RuntimeError("invalid request bmRequestType (TypeClass)");
+    if ((req.bmRequestType&Toastbox::USB::RequestType::TypeMask) != Toastbox::USB::RequestType::TypeClass)
+        throw Toastbox::RuntimeError("invalid request bmRequestType (TypeClass)");
     
     // Verify that the recipient is the `Interface`
-    if ((req.bmRequestType&USB::RequestType::RecipientMask) != USB::RequestType::RecipientInterface)
-        throw RuntimeError("invalid request bmRequestType (RecipientInterface)");
+    if ((req.bmRequestType&Toastbox::USB::RequestType::RecipientMask) != Toastbox::USB::RequestType::RecipientInterface)
+        throw Toastbox::RuntimeError("invalid request bmRequestType (RecipientInterface)");
     
-    switch (req.bmRequestType&USB::RequestType::DirectionMask)
+    switch (req.bmRequestType&Toastbox::USB::RequestType::DirectionMask)
     {
-    case USB::RequestType::DirectionOut:
+    case Toastbox::USB::RequestType::DirectionOut:
         switch (req.bRequest)
         {
-            case USB::CDC::Request::SET_LINE_CODING:
+            case Toastbox::USB::CDC::Request::SET_LINE_CODING:
             {
                 if (payloadLen != sizeof(_LineCoding))
-                    throw RuntimeError("SET_LINE_CODING: payloadLen doesn't match sizeof(USB::CDC::LineCoding)");
+                    throw Toastbox::RuntimeError("SET_LINE_CODING: payloadLen doesn't match sizeof(USB::CDC::LineCoding)");
                 
                 memcpy(&_LineCoding, payload, sizeof(_LineCoding));
                 _LineCoding = {
-                    .dwDTERate      = Endian::HFL_U32(_LineCoding.dwDTERate),
-                    .bCharFormat    = Endian::HFL_U8(_LineCoding.bCharFormat),
-                    .bParityType    = Endian::HFL_U8(_LineCoding.bParityType),
-                    .bDataBits      = Endian::HFL_U8(_LineCoding.bDataBits),
+                    .dwDTERate      = Toastbox::Endian::HFL_U32(_LineCoding.dwDTERate),
+                    .bCharFormat    = Toastbox::Endian::HFL_U8(_LineCoding.bCharFormat),
+                    .bParityType    = Toastbox::Endian::HFL_U8(_LineCoding.bParityType),
+                    .bDataBits      = Toastbox::Endian::HFL_U8(_LineCoding.bDataBits),
                 };
                 
                 printf("SET_LINE_CODING:\n");
@@ -55,7 +55,7 @@ static void _handleXferEP0(VirtualUSBDevice& dev, VirtualUSBDevice::Xfer&& xfer)
                 return;
             }
         
-            case USB::CDC::Request::SET_CONTROL_LINE_STATE:
+            case Toastbox::USB::CDC::Request::SET_CONTROL_LINE_STATE:
             {
                 const bool dtePresent = req.wValue&1;
                 printf("SET_CONTROL_LINE_STATE:\n");
@@ -66,34 +66,34 @@ static void _handleXferEP0(VirtualUSBDevice& dev, VirtualUSBDevice::Xfer&& xfer)
                 return;
             }
         
-            case USB::CDC::Request::SEND_BREAK:
+            case Toastbox::USB::CDC::Request::SEND_BREAK:
             {
                 printf("SEND_BREAK:\n");
                 return;
             }
         
             default:
-                throw RuntimeError("invalid request (DirectionOut): %x", req.bRequest);
+                throw Toastbox::RuntimeError("invalid request (DirectionOut): %x", req.bRequest);
         }
     
-    case USB::RequestType::DirectionIn:
+    case Toastbox::USB::RequestType::DirectionIn:
         switch (req.bRequest)
         {
-            case USB::CDC::Request::GET_LINE_CODING:
+            case Toastbox::USB::CDC::Request::GET_LINE_CODING:
             {
                 printf("GET_LINE_CODING\n");
                 if (payloadLen != sizeof(_LineCoding))
-                    throw RuntimeError("SET_LINE_CODING: payloadLen doesn't match sizeof(USB::CDC::LineCoding)");
-                dev.write(USB::Endpoint::DefaultIn, &_LineCoding, sizeof(_LineCoding));
+                    throw Toastbox::RuntimeError("SET_LINE_CODING: payloadLen doesn't match sizeof(USB::CDC::LineCoding)");
+                dev.write(Toastbox::USB::Endpoint::DefaultIn, &_LineCoding, sizeof(_LineCoding));
                 return;
             }
             
             default:
-                throw RuntimeError("invalid request (DirectionIn): %x", req.bRequest);
+                throw Toastbox::RuntimeError("invalid request (DirectionIn): %x", req.bRequest);
         }
     
     default:
-        throw RuntimeError("invalid request direction");
+        throw Toastbox::RuntimeError("invalid request direction");
     }
 }
 
@@ -113,7 +113,7 @@ static void _handleXferEPX(VirtualUSBDevice& dev, VirtualUSBDevice::Xfer&& xfer)
         }
     
     default:
-        throw RuntimeError("invalid endpoint: 0x%02x", xfer.ep);
+        throw Toastbox::RuntimeError("invalid endpoint: 0x%02x", xfer.ep);
     }
 }
 
@@ -160,7 +160,7 @@ int main(int argc, const char* argv[])
         }
         catch (std::exception& e)
         {
-            throw RuntimeError(
+            throw Toastbox::RuntimeError(
                 "Failed to start VirtualUSBDevice: %s"                                  "\n"
                 "Make sure:"                                                            "\n"
                 "  - you're root"                                                       "\n"

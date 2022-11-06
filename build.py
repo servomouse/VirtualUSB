@@ -3,11 +3,7 @@ import subprocess
 import time
 import glob
 
-additional_files = ["main.cpp",
-                    "VirtualUSBDevice.cpp",
-                    "USBIPLib.cpp",
-                    "LIB/Toastbox/USBDevice.cpp",
-                    ]
+additional_files = []
 
 def get_files(path:str)->list:
     result = []
@@ -29,7 +25,8 @@ compiler_flags =   ["-O0",
 
 linker_path = "g++"
 linker_flags = ["-ludev", 
-                "-lpthread"
+                "-lpthread",
+                "-lusb-1.0",    # !important!
                 ]
 
 def compile(input_file:str, output_file:str) -> int:

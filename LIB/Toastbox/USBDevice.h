@@ -50,7 +50,6 @@ public:
     template <typename T>
     void read(uint8_t epAddr, T& t, Milliseconds timeout=Forever);
     
-    #warning TODO: loop if ior==interrupted
     size_t read(uint8_t epAddr, void* buf, size_t len, Milliseconds timeout=Forever);
     
     template <typename T>
@@ -96,7 +95,7 @@ private:
 
     using _LibusbDev = RefCounted<libusb_device*, _Retain, _Release>;
 
-    static void _Close(libusb_device_handle* x) { libusb_close(x); }
+    static void _Close(libusb_device_handle* x);
 
     using _LibusbHandle = Uniqued<libusb_device_handle*, _Close>;
 

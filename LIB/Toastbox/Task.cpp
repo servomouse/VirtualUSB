@@ -1,6 +1,12 @@
 
 #include "Task.h"
 
+// #warning temporary implementation!
+// uint32_t Task:: TimeMs(void)
+// {
+//     return 10;
+// }
+
 template <typename T, size_t N>
 [[noreturn]] void Task::Run(T (&tasks)[N])
 {

@@ -10,9 +10,9 @@
 
 namespace Descriptor {
 
-using namespace Endian;
+using namespace Toastbox::Endian;
 
-constexpr USB::DeviceDescriptor Device = {
+constexpr Toastbox::USB::DeviceDescriptor Device = {
     .bLength                = LFH_U8(sizeof(Device)),
     .bDescriptorType        = LFH_U8(0x01),
     .bcdUSB                 = LFH_U16(0x0200),
@@ -29,7 +29,7 @@ constexpr USB::DeviceDescriptor Device = {
     .bNumConfigurations     = LFH_U8(0x01),
 };
 
-constexpr USB::DeviceQualifierDescriptor DeviceQualifier = {
+constexpr Toastbox::USB::DeviceQualifierDescriptor DeviceQualifier = {
     .bLength                = LFH_U8(sizeof(DeviceQualifier)),
     .bType                  = LFH_U8(0x06),
     .bcdUSB                 = LFH_U16(0x0200),
@@ -41,24 +41,25 @@ constexpr USB::DeviceQualifierDescriptor DeviceQualifier = {
     .bReserved              = LFH_U8(0x00),
 };
 
-struct Configuration {
-    USB::ConfigurationDescriptor configDesc;
-    USB::InterfaceDescriptor iface0Desc;
-        USB::CDC::HeaderFunctionalDescriptor headerFuncDesc;
-        USB::CDC::CallManagementFunctionalDescriptor callManagementFuncDesc;
-        USB::CDC::AbstractControlManagementFunctionalDescriptor acmFuncDesc;
-        USB::CDC::UnionFunctionalDescriptor unionFuncDesc;
-        USB::EndpointDescriptor epIn1Desc;
+struct Configuration
+{
+    Toastbox::USB::ConfigurationDescriptor configDesc;
+    Toastbox::USB::InterfaceDescriptor iface0Desc;
+    Toastbox::USB::CDC::HeaderFunctionalDescriptor headerFuncDesc;
+    Toastbox::USB::CDC::CallManagementFunctionalDescriptor callManagementFuncDesc;
+    Toastbox::USB::CDC::AbstractControlManagementFunctionalDescriptor acmFuncDesc;
+    Toastbox::USB::CDC::UnionFunctionalDescriptor unionFuncDesc;
+    Toastbox::USB::EndpointDescriptor epIn1Desc;
     
-    USB::InterfaceDescriptor iface1Desc;
-        USB::EndpointDescriptor epOut2Desc;
-        USB::EndpointDescriptor epIn2Desc;
+    Toastbox::USB::InterfaceDescriptor iface1Desc;
+    Toastbox::USB::EndpointDescriptor epOut2Desc;
+    Toastbox::USB::EndpointDescriptor epIn2Desc;
 } __attribute__((packed));
 
 constexpr Configuration Configuration = {
     .configDesc = {
-        .bLength                        = LFH_U8(sizeof(USB::ConfigurationDescriptor)),
-        .bDescriptorType                = LFH_U8(USB::DescriptorType::Configuration),
+        .bLength                        = LFH_U8(sizeof(Toastbox::USB::ConfigurationDescriptor)),
+        .bDescriptorType                = LFH_U8(Toastbox::USB::DescriptorType::Configuration),
         .wTotalLength                   = LFH_U16(sizeof(Configuration)),
         .bNumInterfaces                 = LFH_U8(0x02),
         .bConfigurationValue            = LFH_U8(0x01),
@@ -68,8 +69,8 @@ constexpr Configuration Configuration = {
     },
     
         .iface0Desc = {
-            .bLength                    = LFH_U8(sizeof(USB::InterfaceDescriptor)),
-            .bDescriptorType            = LFH_U8(USB::DescriptorType::Interface),
+            .bLength                    = LFH_U8(sizeof(Toastbox::USB::InterfaceDescriptor)),
+            .bDescriptorType            = LFH_U8(Toastbox::USB::DescriptorType::Interface),
             .bInterfaceNumber           = LFH_U8(0x00),
             .bAlternateSetting          = LFH_U8(0x00),
             .bNumEndpoints              = LFH_U8(0x01),
@@ -110,8 +111,8 @@ constexpr Configuration Configuration = {
             },
             
             .epIn1Desc = {
-                .bLength                = LFH_U8(sizeof(USB::EndpointDescriptor)),
-                .bDescriptorType        = LFH_U8(USB::DescriptorType::Endpoint),
+                .bLength                = LFH_U8(sizeof(Toastbox::USB::EndpointDescriptor)),
+                .bDescriptorType        = LFH_U8(Toastbox::USB::DescriptorType::Endpoint),
                 .bEndpointAddress       = LFH_U8(0x81),
                 .bmAttributes           = LFH_U8(0x03),
                 .wMaxPacketSize         = LFH_U16(0x0008),
@@ -119,8 +120,8 @@ constexpr Configuration Configuration = {
             },
         
         .iface1Desc = {
-            .bLength                    = LFH_U8(sizeof(USB::InterfaceDescriptor)),
-            .bDescriptorType            = LFH_U8(USB::DescriptorType::Interface),
+            .bLength                    = LFH_U8(sizeof(Toastbox::USB::InterfaceDescriptor)),
+            .bDescriptorType            = LFH_U8(Toastbox::USB::DescriptorType::Interface),
             .bInterfaceNumber           = LFH_U8(0x01),
             .bAlternateSetting          = LFH_U8(0x00),
             .bNumEndpoints              = LFH_U8(0x02),
@@ -131,8 +132,8 @@ constexpr Configuration Configuration = {
         },
         
             .epOut2Desc = {
-                .bLength                = LFH_U8(sizeof(USB::EndpointDescriptor)),
-                .bDescriptorType        = LFH_U8(USB::DescriptorType::Endpoint),
+                .bLength                = LFH_U8(sizeof(Toastbox::USB::EndpointDescriptor)),
+                .bDescriptorType        = LFH_U8(Toastbox::USB::DescriptorType::Endpoint),
                 .bEndpointAddress       = LFH_U8(0x02),
                 .bmAttributes           = LFH_U8(0x02),
                 .wMaxPacketSize         = LFH_U16(0x0020),
@@ -140,8 +141,8 @@ constexpr Configuration Configuration = {
             },
             
             .epIn2Desc = {
-                .bLength                = LFH_U8(sizeof(USB::EndpointDescriptor)),
-                .bDescriptorType        = LFH_U8(USB::DescriptorType::Endpoint),
+                .bLength                = LFH_U8(sizeof(Toastbox::USB::EndpointDescriptor)),
+                .bDescriptorType        = LFH_U8(Toastbox::USB::DescriptorType::Endpoint),
                 .bEndpointAddress       = LFH_U8(0x82),
                 .bmAttributes           = LFH_U8(0x02),
                 .wMaxPacketSize         = LFH_U16(0x0020),
@@ -149,20 +150,20 @@ constexpr Configuration Configuration = {
             },
 };
 
-const USB::ConfigurationDescriptor* Configurations[] = {
-    (USB::ConfigurationDescriptor*)&Configuration,
+const Toastbox::USB::ConfigurationDescriptor* Configurations[] = {
+    (Toastbox::USB::ConfigurationDescriptor*)&Configuration,
 };
 
-constexpr auto String0 = USB::SupportedLanguagesDescriptorMake({0x0409});
-constexpr auto String1 = USB::StringDescriptorMake("ManufacturerString");
-constexpr auto String2 = USB::StringDescriptorMake("ProductString");
-constexpr auto String3 = USB::StringDescriptorMake("InterfaceString");
+constexpr auto String0 = Toastbox::USB::SupportedLanguagesDescriptorMake({0x0409});
+constexpr auto String1 = Toastbox::USB::StringDescriptorMake("ManufacturerString");
+constexpr auto String2 = Toastbox::USB::StringDescriptorMake("ProductString");
+constexpr auto String3 = Toastbox::USB::StringDescriptorMake("InterfaceString");
 
-const USB::StringDescriptor* Strings[] = {
-    (USB::StringDescriptor*)&String0,
-    (USB::StringDescriptor*)&String1,
-    (USB::StringDescriptor*)&String2,
-    (USB::StringDescriptor*)&String3,
+const Toastbox::USB::StringDescriptor* Strings[] = {
+    (Toastbox::USB::StringDescriptor*)&String0,
+    (Toastbox::USB::StringDescriptor*)&String1,
+    (Toastbox::USB::StringDescriptor*)&String2,
+    (Toastbox::USB::StringDescriptor*)&String3,
 };
 
 } // namespace Descriptor

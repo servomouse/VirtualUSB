@@ -128,7 +128,7 @@ private:
     
 
 
-// #undef USB
-// #undef RuntimeError
-// #undef Endian
+#undef USB
+#undef RuntimeError
+#undef Endian
 };
