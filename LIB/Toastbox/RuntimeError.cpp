@@ -1,10 +1,11 @@
 #include "RuntimeError.h"
+#include <stdarg.h>
 
-std::string Toastbox::_RuntimeErrorFmtMsg(const char* str)
+std::runtime_error rt_error(const char * str, ...)
 {
-    char msg[256];
-    int sr = snprintf(msg, sizeof(msg), "%s", str);
-    if (sr<0 || (size_t)sr>=(sizeof(msg)-1)) throw std::runtime_error("failed to create RuntimeError");
-    return msg;
+    static char msg[256];
+    va_list args;
+    va_start(args, str);
+    vsnprintf(msg, sizeof(msg), str, args);
+    return std::runtime_error(msg);
 }
-

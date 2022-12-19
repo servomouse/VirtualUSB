@@ -53,6 +53,7 @@
         "cstdio": "cpp",
         "cwctype": "cpp",
         "numbers": "cpp",
-        "semaphore": "cpp"
+        "semaphore": "cpp",
+        "cstdarg": "cpp"
     }
 }

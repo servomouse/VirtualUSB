@@ -1,7 +1,7 @@
 #include "VirtualUSBDevice.h"
+#include "LIB/Toastbox/RuntimeError.h"
 
 #define USB             Toastbox::USB
-#define RuntimeError    Toastbox::RuntimeError
 #define Endian          Toastbox::Endian
 
 struct _Data
@@ -69,19 +69,19 @@ void VirtualUSBDevice::start()
         const uint32_t speed = _SpeedFromBCDUSB(_info.deviceDesc->bcdDevice);
         int sockets[2] = {-1,-1};
         int ir = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
-        if (ir) throw RuntimeError("socketpair failed: %s", strerror(errno));
+        if (ir) throw RUNTIME_ERROR("socketpair failed: %s", strerror(errno));
         _s.socket = sockets[0];
         _s.usbipSocket = sockets[1];
         
         ir = USBIPLib::usbip_vhci_driver_open();
         if (ir)
-            throw RuntimeError("usbip_vhci_driver_open failed: %s", strerror(errno));
+            throw RUNTIME_ERROR("usbip_vhci_driver_open failed: %s", strerror(errno));
         
         for (;;)
         {
             int usbipPort = USBIPLib::usbip_vhci_get_free_port(speed);
             if (usbipPort < 0)
-                throw RuntimeError("usbip_vhci_get_free_port failed: %s", strerror(errno));
+                throw RUNTIME_ERROR("usbip_vhci_get_free_port failed: %s", strerror(errno));
             
             ir = USBIPLib::usbip_vhci_attach_device2(usbipPort, _s.usbipSocket, _DeviceID, speed);
             if (ir < 0)
@@ -89,7 +89,7 @@ void VirtualUSBDevice::start()
                 if (errno == EBUSY)
                     continue;
                 else
-                    throw RuntimeError("usbip_vhci_attach_device2 failed: %s", strerror(errno));
+                    throw RUNTIME_ERROR("usbip_vhci_attach_device2 failed: %s", strerror(errno));
             }
             break;
         }
@@ -244,13 +244,13 @@ void VirtualUSBDevice::_Read(int socket, void* data, size_t len)
     {
         ssize_t sr = recv(socket, (uint8_t*)data+off, len-off, 0);
         if (!sr)
-            throw RuntimeError("recv returned 0");
+            throw RUNTIME_ERROR("recv returned 0");
         if (sr < 0)
         {
             if (errno == EINTR)
                 continue;
             else
-                throw RuntimeError("recv failed: %s", strerror(errno));
+                throw RUNTIME_ERROR("recv failed: %s", strerror(errno));
         }
         off += sr;
     }
@@ -263,13 +263,13 @@ void VirtualUSBDevice::_Write(int socket, const void* data, size_t len)
     {
         ssize_t sr = send(socket, (uint8_t*)data+off, len-off, MSG_NOSIGNAL);
         if (!sr)
-            throw RuntimeError("send returned 0");
+            throw RUNTIME_ERROR("send returned 0");
         if (sr < 0)
         {
             if (errno == EINTR)
                 continue;
             else
-                throw RuntimeError("send failed: %s", strerror(errno));
+                throw RUNTIME_ERROR("send failed: %s", strerror(errno));
         }
         off += sr;
     }
@@ -308,7 +308,7 @@ VirtualUSBDevice::_Cmd VirtualUSBDevice::_ReadCmd(int socket)
             break;
     
         default:
-            throw RuntimeError("unknown USBIP command: %u", (uint32_t)cmd.header.base.command);
+            throw RUNTIME_ERROR("unknown USBIP command: %u", (uint32_t)cmd.header.base.command);
     }
     
     if (cmd.header.base.command==USBIPLib::USBIP_CMD_SUBMIT &&
@@ -345,7 +345,7 @@ uint32_t VirtualUSBDevice::_SpeedFromBCDUSB(uint16_t bcdUSB)
         case 0x0320:
             return USBIPLib::USB_SPEED_SUPER_PLUS;
     }
-    throw RuntimeError("invalid bcdUSB: %x", bcdUSB);
+    throw RUNTIME_ERROR("invalid bcdUSB: %x", bcdUSB);
 }
 
 size_t VirtualUSBDevice::_DescLen(const USB::DeviceDescriptor& d)
@@ -526,7 +526,7 @@ void VirtualUSBDevice::_reply(const _Cmd& cmd, const void* data, size_t len, int
         }
     
         default:
-            throw RuntimeError("invalid cmd.header.base.command: %u", cmd.header.base.command);
+            throw RUNTIME_ERROR("invalid cmd.header.base.command: %u", cmd.header.base.command);
     }
     
     _s.reps.push_back(std::move(rep));
@@ -548,7 +548,7 @@ std::optional<VirtualUSBDevice::Xfer> VirtualUSBDevice::_handleCmd(_Cmd& cmd)
             return std::nullopt;
     
         default:
-            throw RuntimeError("invalid USBIP command: %u", (uint32_t)cmd.header.base.command);
+            throw RUNTIME_ERROR("invalid USBIP command: %u", (uint32_t)cmd.header.base.command);
     }
 }
 
@@ -591,7 +591,7 @@ std::optional<VirtualUSBDevice::Xfer> VirtualUSBDevice::_handleCmdSubmitEPX(_Cmd
             return std::nullopt;
         
         default:
-            throw RuntimeError("invalid Cmd direction");
+            throw RUNTIME_ERROR("invalid Cmd direction");
     }
 }
 
@@ -600,7 +600,7 @@ VirtualUSBDevice::Xfer VirtualUSBDevice::_handleCmdSubmitEPXOut(_Cmd& cmd)
 //        printf("_handleCmdSubmitEPXOut\n");
     const uint8_t epIdx = cmd.header.base.ep;
     if (epIdx >= USB::Endpoint::MaxCount)
-        throw RuntimeError("invalid epIdx");
+        throw RUNTIME_ERROR("invalid epIdx");
     
     // Let host know that we received the data
     _reply(cmd, nullptr, cmd.payloadLen);
@@ -616,7 +616,7 @@ void VirtualUSBDevice::_handleCmdSubmitEPXIn(_Cmd& cmd)
 //        printf("_handleCmdSubmitEPXIn\n");
     const uint8_t epIdx = cmd.header.base.ep;
     if (epIdx >= USB::Endpoint::MaxCount)
-        throw RuntimeError("invalid epIdx");
+        throw RUNTIME_ERROR("invalid epIdx");
     auto& epInCmds = _s.inCmds[epIdx];
     epInCmds.push_back(std::move(cmd));
     _sendDataForInEndpoint(epIdx);
@@ -653,7 +653,7 @@ void VirtualUSBDevice::_handleCmdUnlink(const _Cmd& cmd)
     printf("_handleCmdUnlink\n");
     const uint8_t epIdx = cmd.header.base.ep;
     if (epIdx >= USB::Endpoint::MaxCount)
-        throw RuntimeError("invalid epIdx");
+        throw RUNTIME_ERROR("invalid epIdx");
     
     // Remove the IN cmd from the endpoint's inCmds deque
     bool found = false;
@@ -689,7 +689,7 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
     // We only support requests to the device for now
     const uint8_t recipient = req.bmRequestType & USB::RequestType::RecipientMask;
     if(recipient != USB::RequestType::RecipientDevice)
-        throw RuntimeError("invalid recipient: %u", recipient);
+        throw RUNTIME_ERROR("invalid recipient: %u", recipient);
     
     switch (cmd.header.base.direction)
     {
@@ -702,7 +702,7 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
             {
                 printf("USB::Request::GetStatus\n");
                 if (!_s.configDesc)
-                    throw RuntimeError("no active configuration");
+                    throw RUNTIME_ERROR("no active configuration");
                 uint16_t reply = 0;
                 // If self-powered, bit 0 is 1
                 if (_SelfPowered(*_s.configDesc))
@@ -730,7 +730,7 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
                     case USB::DescriptorType::Configuration:
                         printf("USB::Request::GetDescriptor::Configuration\n");
                         if (descIdx >= _info.configDescsCount)
-                            throw RuntimeError("invalid Configuration descriptor index: %u", descIdx);
+                            throw RUNTIME_ERROR("invalid Configuration descriptor index: %u", descIdx);
                         replyData = _info.configDescs[descIdx];
                         replyDataLen = _DescLen(*_info.configDescs[descIdx]);
                         break;
@@ -740,7 +740,7 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
                         if (_info.stringDescs)
                         {
                             if (descIdx >= _info.stringDescsCount)
-                                throw RuntimeError("invalid String descriptor index: %u", descIdx);
+                                throw RUNTIME_ERROR("invalid String descriptor index: %u", descIdx);
                             replyData = _info.stringDescs[descIdx];
                             replyDataLen = _DescLen(*_info.stringDescs[descIdx]);
                         }
@@ -784,13 +784,13 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
                 }
                 
                 if (!ok)
-                    throw RuntimeError("invalid Configuration value: %u", configVal);
+                    throw RUNTIME_ERROR("invalid Configuration value: %u", configVal);
                 _reply(cmd, nullptr, 0);
                 return;
             }
         
         default:
-            throw RuntimeError("invalid device->host standard request: %u", req.bRequest);
+            throw RUNTIME_ERROR("invalid device->host standard request: %u", req.bRequest);
         }
     }
     
@@ -799,7 +799,7 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
     {
         const size_t payloadLen = cmd.header.cmd_submit.transfer_buffer_length;
         if (payloadLen)
-            throw RuntimeError("unexpected payload for EP0 standard request");
+            throw RUNTIME_ERROR("unexpected payload for EP0 standard request");
         
         switch (req.bRequest)
         {
@@ -820,18 +820,18 @@ void VirtualUSBDevice::_handleCmdSubmitEP0StandardRequest(const _Cmd& cmd, const
                 }
                 
                 if (!ok)
-                    throw RuntimeError("invalid Configuration value: %u", configVal);
+                    throw RUNTIME_ERROR("invalid Configuration value: %u", configVal);
                 _reply(cmd, nullptr, payloadLen);
                 return;
             }
             
             default:
-                throw RuntimeError("invalid host->device standard request: %u", req.bRequest);
+                throw RUNTIME_ERROR("invalid host->device standard request: %u", req.bRequest);
         }
     }
     
     default:
-        throw RuntimeError("invalid Cmd direction");
+        throw RUNTIME_ERROR("invalid Cmd direction");
     }
 }
 

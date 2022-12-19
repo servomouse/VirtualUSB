@@ -1,4 +1,5 @@
 #include "USBDevice.h"
+#include "RuntimeError.h"
 #include <libusb-1.0/libusb.h>
 
 // using namespace Toastbox;
@@ -31,7 +32,7 @@ Toastbox::USBDevice::USBDevice(libusb_device* dev) : _dev(_LibusbDev::Retain, st
             const struct libusb_interface& iface = configDesc->interface[ifaceIdx];
             
             // For now we're only looking at altsetting 0
-            if (iface.num_altsetting < 1) throw RuntimeError("interface has no altsettings");
+            if (iface.num_altsetting < 1) throw RUNTIME_ERROR("interface has no altsettings");
             _interfaces.push_back({
                 .bInterfaceNumber = iface.altsetting[0].bInterfaceNumber,
             });
@@ -107,7 +108,7 @@ template <typename T>
 void Toastbox::USBDevice::read(uint8_t epAddr, T& t, Milliseconds timeout)
 {
     const size_t len = read(epAddr, (void*)&t, sizeof(t), timeout);
-    if (len != sizeof(t)) throw RuntimeError("read() didn't read enough data (needed %ju bytes, got %ju bytes)",
+    if (len != sizeof(t)) throw RUNTIME_ERROR("read() didn't read enough data (needed %ju bytes, got %ju bytes)",
         (uintmax_t)sizeof(t), (uintmax_t)len);
 }
 
@@ -137,7 +138,7 @@ void Toastbox::USBDevice::write(uint8_t epAddr, const void* buf, size_t len, Mil
         _LibUSBTimeoutFromMs(timeout));
     _CheckErr(ir, "libusb_bulk_transfer failed");
     if ((size_t)xferLen != len)
-        throw RuntimeError("libusb_bulk_transfer short write (tried: %zu, got: %zu)", len, (size_t)xferLen);
+        throw RUNTIME_ERROR("libusb_bulk_transfer short write (tried: %zu, got: %zu)", len, (size_t)xferLen);
 }
 
 void Toastbox::USBDevice::reset(uint8_t epAddr)
@@ -199,7 +200,7 @@ unsigned int Toastbox::USBDevice::_LibUSBTimeoutFromMs(Milliseconds timeout)
 
 void Toastbox::USBDevice::_CheckErr(int ir, const char* errMsg)
 {
-    if (ir < 0) throw RuntimeError("%s: %s", errMsg, libusb_error_name(ir));
+    if (ir < 0) throw RUNTIME_ERROR("%s: %s", errMsg, libusb_error_name(ir));
 }
 
 void Toastbox::USBDevice::_openIfNeeded()
@@ -226,7 +227,7 @@ void Toastbox::USBDevice::_claimInterfaceForEndpointAddr(uint8_t epAddr)
 const Toastbox::USBDevice::_EndpointInfo& Toastbox::USBDevice::_epInfo(uint8_t epAddr) const
 {
     const _EndpointInfo& epInfo = _epInfos[_OffsetForEndpointAddr(epAddr)];
-    if (!epInfo.valid) throw RuntimeError("invalid endpoint address: 0x%02x", epAddr);
+    if (!epInfo.valid) throw RUNTIME_ERROR("invalid endpoint address: 0x%02x", epAddr);
     return epInfo;
 }
 
