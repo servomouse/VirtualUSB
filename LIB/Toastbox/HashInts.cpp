@@ -1,16 +1,14 @@
 
 #include "HashInts.h"
 
-template <typename... Ts>
-size_t Toastbox::HashInts(Ts... ts)
+size_t hash_ints(const uint8_t * bytes, int len)
 {
-    // FNV-1 hash
-    const uintmax_t v[] = {(uintmax_t)ts...};
-    const uint8_t* b = (uint8_t*)&v;
-    size_t hash = (size_t)0xcbf29ce484222325;
-    for (size_t i=0; i<sizeof(v); i++) {
-        hash *= 0x100000001b3;
-        hash ^= b[i];
+    size_t prime = 0x100000001b3;
+    size_t res = (size_t)0xcbf29ce484222325;
+    for (int i=0; i < len; ++i)
+    {
+        res ^= bytes[i];
+        res *= prime;
     }
-    return hash;
+    return res;
 }

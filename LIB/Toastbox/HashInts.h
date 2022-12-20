@@ -2,9 +2,4 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace Toastbox {
-
-template <typename... Ts>
-size_t HashInts(Ts... ts);
-
-} // namespace Toastbox
+size_t hash_ints(const uint8_t * bytes, int len);
