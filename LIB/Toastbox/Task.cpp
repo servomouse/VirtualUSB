@@ -14,14 +14,14 @@ template <typename T, size_t N>
     {
         bool didWork = false;
         do {
-            _IRQ.disable();
+            // _IRQ.disable();
             didWork = false;
             for (Task& task : tasks) {
                 didWork |= task.run();
             }
         } while (didWork);
-        IRQState::WaitForInterrupt();
-        _IRQ.restore();
+        // IRQState::WaitForInterrupt();
+        // _IRQ.restore();
     }
 }
 template <typename ...T>
@@ -102,7 +102,7 @@ void Task::_setRunning()
 {
     _state = Task::State::Run;
     _didWork = true;
-    _IRQ.restore();
+    // _IRQ.restore();
 }
 
 // bool Task::_sleepDone() const

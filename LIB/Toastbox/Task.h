@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
 #include <stdint.h>
-#include "IRQState.h"
 
 #define TaskBegin()                         \
     Task& _task = (*Task::_CurrentTask);    \
@@ -74,7 +73,6 @@ public:
     
     // bool _sleepDone() const;
     
-    static inline IRQState _IRQ;
     std::function<void(void)> _fn;
     static inline Task* _CurrentTask;
     State _state;
