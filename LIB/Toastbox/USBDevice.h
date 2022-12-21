@@ -35,7 +35,7 @@ public:
     USBDevice(USBDevice&& x) = default;
     USBDevice& operator=(USBDevice&& x) = default;
     
-    std::vector<USBDevice> GetDevices();
+    // std::vector<USBDevice> GetDevices();
     
     USBDevice(libusb_device* dev);
     
@@ -67,27 +67,27 @@ public:
     operator libusb_device*() const { return _dev; }
     
 private:
-    struct _EndpointInfo
-    {
-        bool valid = false;
-        uint8_t epAddr = 0;
-        uint8_t ifaceIdx = 0;
-        uint16_t maxPacketSize = 0;
-    };
+    // struct _EndpointInfo
+    // {
+    //     bool valid = false;
+    //     uint8_t epAddr = 0;
+    //     uint8_t ifaceIdx = 0;
+    //     uint16_t maxPacketSize = 0;
+    // };
     
-    static libusb_context* _USBCtx();
+    // static libusb_context* _USBCtx();
 
-    static uint8_t _OffsetForEndpointAddr(uint8_t epAddr);
+    // static uint8_t _OffsetForEndpointAddr(uint8_t epAddr);
 
     static unsigned int _LibUSBTimeoutFromMs(Milliseconds timeout);
 
-    static void _CheckErr(int ir, const char* errMsg);
+    // static void _CheckErr(int ir, const char* errMsg);
 
     void _openIfNeeded();
 
     void _claimInterfaceForEndpointAddr(uint8_t epAddr);
 
-    const _EndpointInfo& _epInfo(uint8_t epAddr) const;
+    // const _EndpointInfo& _epInfo(uint8_t epAddr) const;
 
     static void _Retain(libusb_device* x);
 
@@ -95,17 +95,17 @@ private:
 
     using _LibusbDev = RefCounted<libusb_device*, _Retain, _Release>;
 
-    static void _Close(libusb_device_handle* x);
+    // static void _Close(libusb_device_handle* x);
 
-    using _LibusbHandle = Uniqued<libusb_device_handle*, _Close>;
+    // using _LibusbHandle = Uniqued<libusb_device_handle*, _Close>;
 
     _LibusbDev _dev = {};
 
-    _LibusbHandle _handle = {};
+    // _LibusbHandle _handle = {};
 
     std::vector<_Interface> _interfaces = {};
 
-    _EndpointInfo _epInfos[USB::Endpoint::MaxCount] = {};
+    // _EndpointInfo _epInfos[USB::Endpoint::MaxCount] = {};
     
 public:
     

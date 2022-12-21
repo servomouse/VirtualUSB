@@ -77,6 +77,10 @@ namespace Endpoint
     static constexpr uint8_t IndexMask                  = 0x0F;
 };
 
+#define DIRECTION_MASK  0x80
+#define INDEX_MASK      0x0F
+#define MAX_COUNT        32 // Max number of endpoints, total
+
 namespace Language
 {
     static constexpr uint16_t English                   = 0x0409;
