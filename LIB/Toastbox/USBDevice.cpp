@@ -5,6 +5,14 @@
 
 // using namespace Toastbox;
 
+struct _Interface {
+    uint8_t bInterfaceNumber = 0;
+    bool claimed = false;
+};
+
+std::vector<_Interface> _interfaces = {};
+
+
 
 uint8_t OffsetForEndpointAddr(uint8_t epAddr)
 {
@@ -260,19 +268,12 @@ void Toastbox::USBDevice::_claimInterfaceForEndpointAddr(uint8_t epAddr)
     }
 }
 
-// const _EndpointInfo& Toastbox::USBDevice::_epInfo(uint8_t epAddr) const
-// {
-//     const _EndpointInfo& epInfo = _epInfos[_OffsetForEndpointAddr(epAddr)];
-//     if (!epInfo.valid) throw RUNTIME_ERROR("invalid endpoint address: 0x%02x", epAddr);
-//     return epInfo;
-// }
-
-void Toastbox::USBDevice::_Retain(libusb_device* x)
+void Retain(libusb_device* x)
 {
     libusb_ref_device(x);
 }
 
-void Toastbox::USBDevice::_Release(libusb_device* x)
+void Release(libusb_device* x)
 {
     libusb_unref_device(x);
 }
